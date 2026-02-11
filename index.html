@@ -75,6 +75,19 @@
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 1000;
+        }
+
+        /* Schedule Grid */
+        .schedule-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
         }
 
         select, button {
@@ -109,15 +122,6 @@
             color: var(--subtext);
             font-weight: 400;
             box-shadow: none;
-        }
-
-        /* Schedule Grid */
-        .schedule-container {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
         }
 
         .class-card {
