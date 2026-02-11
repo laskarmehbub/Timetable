@@ -304,7 +304,6 @@
             width: 18px;
             font-size: 14px;
             color: #818cf8;
-            color: #f8fafc;
         }
 
         .select-option:not(.selected) .checkmark {
@@ -318,11 +317,23 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 50;
+            z-index: 90;
         }
 
         .custom-select.open ~ .dropdown-overlay {
             display: block;
+        }
+
+        .custom-select {
+            z-index: 100;
+        }
+
+        .custom-select.open {
+            z-index: 200;
+        }
+
+        .select-options {
+            z-index: 999;
         }
 
     </style>
