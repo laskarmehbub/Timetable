@@ -1,12 +1,13 @@
-const CACHE_NAME = 'timetable-v4';
+const CACHE_NAME = 'timetable-v5';
 const urlsToCache = [
-    '/Timetable/',
-    '/Timetable/index.html',
-    '/Timetable/timetable.html',
-    '/Timetable/manifest.json',
-    '/Timetable/sw.js',
-    '/Timetable/icon-192.png',
-    '/Timetable/icon-512.png'
+    './',
+    './index.html',
+    './timetable.html',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png',
+    './icon-192-maskable.png',
+    './icon-512-maskable.png'
 ];
 
 // Install service worker and cache assets
