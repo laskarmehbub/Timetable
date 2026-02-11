@@ -163,6 +163,124 @@
         .tag.theory { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
         .tag.practical { background: rgba(16, 185, 129, 0.2); color: #34d399; }
 
+        /* Custom Dropdown */
+        .custom-select {
+            position: relative;
+            min-width: 140px;
+        }
+
+        .select-trigger {
+            background-color: rgba(255,255,255,0.05);
+            border: none;
+            color: var(--text);
+            padding: 8px 36px 8px 16px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--text);
+        }
+
+        .custom-select.open .select-trigger::after {
+            border-top-color: transparent;
+            border-bottom-color: var(--text);
+            transform: translateY(-80%);
+        }
+
+        .select-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            min-width: 280px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .custom-select.open .select-options {
+            max-height: 400px;
+            opacity: 1;
+            padding: 8px 0;
+        }
+
+        .select-option {
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            color: var(--text);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            transition: background 0.15s;
+        }
+
+        .select-option:last-child {
+            border-bottom: none;
+        }
+
+        .select-option:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .select-option.selected {
+            color: var(--accent);
+        }
+
+        .select-option .radio {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--subtext);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .select-option.selected .radio {
+            border-color: var(--accent);
+        }
+
+        .select-option.selected .radio::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .dropdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+        }
+
+        .custom-select.open ~ .dropdown-overlay {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -173,14 +291,38 @@
     </div>
 
     <div class="controls">
-        <select id="daySelect" onchange="renderSchedule()">
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-        </select>
+        <div class="custom-select" id="dayDropdown">
+            <div class="select-trigger" onclick="toggleDropdown()">
+                <span id="selectedDay">Monday</span>
+            </div>
+            <div class="select-options">
+                <div class="select-option selected" data-value="Monday" onclick="selectDay('Monday')">
+                    <span>Monday</span>
+                    <div class="radio"></div>
+                </div>
+                <div class="select-option" data-value="Tuesday" onclick="selectDay('Tuesday')">
+                    <span>Tuesday</span>
+                    <div class="radio"></div>
+                </div>
+                <div class="select-option" data-value="Wednesday" onclick="selectDay('Wednesday')">
+                    <span>Wednesday</span>
+                    <div class="radio"></div>
+                </div>
+                <div class="select-option" data-value="Thursday" onclick="selectDay('Thursday')">
+                    <span>Thursday</span>
+                    <div class="radio"></div>
+                </div>
+                <div class="select-option" data-value="Friday" onclick="selectDay('Friday')">
+                    <span>Friday</span>
+                    <div class="radio"></div>
+                </div>
+                <div class="select-option" data-value="Saturday" onclick="selectDay('Saturday')">
+                    <span>Saturday</span>
+                    <div class="radio"></div>
+                </div>
+            </div>
+        </div>
+        <div class="dropdown-overlay" onclick="closeDropdown()"></div>
         <button id="weekToggle" class="toggle-btn" onclick="toggleWeek()">Week 1</button>
     </div>
 
@@ -257,12 +399,47 @@
         };
 
         let currentWeek = "Week 1";
+        let currentDay = "Monday";
         
         // Auto-set today's day
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let today = days[new Date().getDay()];
         if (today === "Sunday") today = "Monday"; // Default to Mon if Sunday
-        document.getElementById("daySelect").value = today;
+        currentDay = today;
+        document.getElementById("selectedDay").innerText = today;
+        
+        // Update selected option visually
+        document.querySelectorAll('.select-option').forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.value === today) {
+                opt.classList.add('selected');
+            }
+        });
+
+        // Custom dropdown functions
+        function toggleDropdown() {
+            document.getElementById('dayDropdown').classList.toggle('open');
+        }
+
+        function closeDropdown() {
+            document.getElementById('dayDropdown').classList.remove('open');
+        }
+
+        function selectDay(day) {
+            currentDay = day;
+            document.getElementById('selectedDay').innerText = day;
+            
+            // Update selected state
+            document.querySelectorAll('.select-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === day) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            closeDropdown();
+            renderSchedule();
+        }
 
         function toggleWeek() {
             currentWeek = currentWeek === "Week 1" ? "Week 2" : "Week 1";
@@ -271,7 +448,7 @@
         }
 
         function renderSchedule() {
-            const day = document.getElementById("daySelect").value;
+            const day = currentDay;
             const container = document.getElementById("scheduleList");
             container.innerHTML = "";
 
