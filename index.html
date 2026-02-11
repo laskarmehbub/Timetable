@@ -12,17 +12,28 @@
     <title>6th Sem Timetable</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #0a0a1a;
+            --card-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg-solid: #1a1a2e;
             --text: #f8fafc;
-            --subtext: #94a3b8;
-            --accent: #3b82f6;
+            --subtext: #a1a1aa;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            background: linear-gradient(180deg, #0a0a1a 0%, #0f0f23 50%, #1a1a2e 100%);
+            background-attachment: fixed;
             color: var(--text);
             margin: 0;
             padding: 20px;
@@ -34,18 +45,22 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         p {
             color: var(--subtext);
-            margin: 5px 0 0 0;
+            margin: 8px 0 0 0;
             font-size: 0.9rem;
         }
 
@@ -53,20 +68,22 @@
         .controls {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            background: var(--card-bg);
-            padding: 5px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 6px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         select, button {
             background: transparent;
             border: none;
             color: var(--text);
-            padding: 8px 16px;
+            padding: 10px 18px;
             font-size: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
         }
 
@@ -76,14 +93,22 @@
         }
 
         .toggle-btn {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%);
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
         }
 
         .toggle-btn.inactive {
-            background-color: transparent;
+            background: transparent;
             color: var(--subtext);
             font-weight: 400;
+            box-shadow: none;
         }
 
         /* Schedule Grid */
@@ -92,23 +117,45 @@
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .class-card {
-            background-color: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            border-left: 4px solid var(--accent);
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 16px;
+            border-left: 4px solid var(--accent-blue);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         .class-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+        }
+
+        .class-card.practical {
+            border-left-color: var(--accent-green);
+        }
+
+        .class-card.theory {
+            border-left-color: var(--accent-blue);
         }
 
         .time-slot {
@@ -118,13 +165,17 @@
 
         .time {
             font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary);
+            font-size: 1.15rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .duration {
             font-size: 0.75rem;
             color: var(--subtext);
+            margin-top: 4px;
         }
 
         .subject-info {
@@ -133,35 +184,39 @@
 
         .subject {
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 2px;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
         }
 
         .professor {
-            font-size: 0.85rem;
-            color: var(--subtext);
-            background: rgba(255,255,255,0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .empty-state {
             text-align: center;
             color: var(--subtext);
-            padding: 40px;
+            padding: 50px;
             font-style: italic;
+            background: var(--card-bg);
+            border-radius: 16px;
         }
 
         .tag {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-right: 6px;
-            padding: 2px 4px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
         }
-        .tag.theory { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .tag.practical { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag.theory { background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(99, 102, 241, 0.3) 100%); color: #93c5fd; }
+        .tag.practical { background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(52, 211, 153, 0.3) 100%); color: #6ee7b7; }
 
         /* Custom Dropdown */
         .custom-select {
@@ -170,23 +225,28 @@
         }
 
         .select-trigger {
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255,255,255,0.08);
             border: none;
             color: var(--text);
-            padding: 8px 36px 8px 16px;
+            padding: 10px 36px 10px 16px;
             font-size: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .select-trigger:hover {
+            background-color: rgba(255,255,255,0.12);
         }
 
         .select-trigger::after {
             content: '';
             position: absolute;
-            right: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             border: 5px solid transparent;
@@ -201,43 +261,49 @@
 
         .select-options {
             position: absolute;
-            top: calc(100% + 4px);
+            top: calc(100% + 6px);
             left: 0;
-            background: #2a3441;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #1e2433 0%, #252d3d 100%);
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 100;
-            min-width: 160px;
+            min-width: 170px;
             max-height: 0;
             overflow: hidden;
             opacity: 0;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
         }
 
         .custom-select.open .select-options {
-            max-height: 300px;
+            max-height: 320px;
             opacity: 1;
-            padding: 6px 0;
+            padding: 8px 0;
         }
 
         .select-option {
-            padding: 10px 16px;
+            padding: 12px 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 1rem;
             color: #f8fafc;
-            transition: background 0.1s;
+            transition: all 0.15s ease;
         }
 
         .select-option:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .select-option.selected {
+            background: rgba(99, 102, 241, 0.1);
         }
 
         .select-option .checkmark {
-            width: 16px;
+            width: 18px;
             font-size: 14px;
+            color: #818cf8;
             color: #f8fafc;
         }
 
