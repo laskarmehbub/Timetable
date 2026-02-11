@@ -201,70 +201,48 @@
 
         .select-options {
             position: absolute;
-            top: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            top: calc(100% + 4px);
+            left: 0;
+            background: #2a3441;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             z-index: 100;
-            min-width: 280px;
+            min-width: 160px;
             max-height: 0;
             overflow: hidden;
             opacity: 0;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
         .custom-select.open .select-options {
-            max-height: 400px;
+            max-height: 300px;
             opacity: 1;
-            padding: 8px 0;
+            padding: 6px 0;
         }
 
         .select-option {
-            padding: 16px 20px;
+            padding: 10px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 1.1rem;
-            color: var(--text);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            transition: background 0.15s;
-        }
-
-        .select-option:last-child {
-            border-bottom: none;
+            gap: 8px;
+            font-size: 1rem;
+            color: #f8fafc;
+            transition: background 0.1s;
         }
 
         .select-option:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.1);
         }
 
-        .select-option.selected {
-            color: var(--accent);
+        .select-option .checkmark {
+            width: 16px;
+            font-size: 14px;
+            color: #f8fafc;
         }
 
-        .select-option .radio {
-            width: 22px;
-            height: 22px;
-            border: 2px solid var(--subtext);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .select-option.selected .radio {
-            border-color: var(--accent);
-        }
-
-        .select-option.selected .radio::after {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
+        .select-option:not(.selected) .checkmark {
+            visibility: hidden;
         }
 
         .dropdown-overlay {
@@ -297,28 +275,28 @@
             </div>
             <div class="select-options">
                 <div class="select-option selected" data-value="Monday" onclick="selectDay('Monday')">
+                    <span class="checkmark">✓</span>
                     <span>Monday</span>
-                    <div class="radio"></div>
                 </div>
                 <div class="select-option" data-value="Tuesday" onclick="selectDay('Tuesday')">
+                    <span class="checkmark">✓</span>
                     <span>Tuesday</span>
-                    <div class="radio"></div>
                 </div>
                 <div class="select-option" data-value="Wednesday" onclick="selectDay('Wednesday')">
+                    <span class="checkmark">✓</span>
                     <span>Wednesday</span>
-                    <div class="radio"></div>
                 </div>
                 <div class="select-option" data-value="Thursday" onclick="selectDay('Thursday')">
+                    <span class="checkmark">✓</span>
                     <span>Thursday</span>
-                    <div class="radio"></div>
                 </div>
                 <div class="select-option" data-value="Friday" onclick="selectDay('Friday')">
+                    <span class="checkmark">✓</span>
                     <span>Friday</span>
-                    <div class="radio"></div>
                 </div>
                 <div class="select-option" data-value="Saturday" onclick="selectDay('Saturday')">
+                    <span class="checkmark">✓</span>
                     <span>Saturday</span>
-                    <div class="radio"></div>
                 </div>
             </div>
         </div>
