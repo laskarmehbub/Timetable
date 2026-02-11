@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="2nd Sem">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>2nd Sem Timetable</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --subtext: #94a3b8;
+            --accent: #a78bfa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            color: var(--subtext);
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .date-range {
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-top: 8px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 5px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .toggle-btn {
+            background-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Custom Dropdown */
+        .custom-select {
+            position: relative;
+            min-width: 140px;
+        }
+
+        .select-trigger {
+            background-color: rgba(255,255,255,0.05);
+            border: none;
+            color: var(--text);
+            padding: 8px 36px 8px 16px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--text);
+        }
+
+        .custom-select.open .select-trigger::after {
+            border-top-color: transparent;
+            border-bottom-color: var(--text);
+            transform: translateY(-80%);
+        }
+
+        .select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #2a3441;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            min-width: 160px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.15s ease;
+        }
+
+        .custom-select.open .select-options {
+            max-height: 300px;
+            opacity: 1;
+            padding: 6px 0;
+        }
+
+        .select-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            color: #f8fafc;
+            transition: background 0.1s;
+        }
+
+        .select-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .select-option .checkmark {
+            width: 16px;
+            font-size: 14px;
+            color: #f8fafc;
+        }
+
+        .select-option:not(.selected) .checkmark {
+            visibility: hidden;
+        }
+
+        .dropdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+        }
+
+        .custom-select.open ~ .dropdown-overlay {
+            display: block;
+        }
+
+        /* Schedule Grid */
+        .schedule-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .class-card {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .class-card.minor {
+            border-left-color: #f472b6;
+        }
+
+        .class-card.major {
+            border-left-color: #34d399;
+        }
+
+        .class-card.mdc {
+            border-left-color: #fbbf24;
+        }
+
+        .time-slot {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .duration {
+            font-size: 0.75rem;
+            color: var(--subtext);
+        }
+
+        .subject-info {
+            text-align: right;
+        }
+
+        .subject {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        .professor {
+            font-size: 0.85rem;
+            color: var(--subtext);
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--subtext);
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .tag.minor { background: rgba(244, 114, 182, 0.2); color: #f472b6; }
+        .tag.major { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .tag.mdc { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Dept. of Mathematics</h1>
+        <p>Semester 2 Schedule</p>
+        <div class="date-range">12th February 2026 - May 2026</div>
+    </div>
+
+    <div class="controls">
+        <div class="custom-select" id="dayDropdown">
+            <div class="select-trigger" onclick="toggleDropdown()">
+                <span id="selectedDay">Monday</span>
+            </div>
+            <div class="select-options">
+                <div class="select-option selected" data-value="Monday" onclick="selectDay('Monday')">
+                    <span class="checkmark">✓</span>
+                    <span>Monday</span>
+                </div>
+                <div class="select-option" data-value="Tuesday" onclick="selectDay('Tuesday')">
+                    <span class="checkmark">✓</span>
+                    <span>Tuesday</span>
+                </div>
+                <div class="select-option" data-value="Wednesday" onclick="selectDay('Wednesday')">
+                    <span class="checkmark">✓</span>
+                    <span>Wednesday</span>
+                </div>
+                <div class="select-option" data-value="Thursday" onclick="selectDay('Thursday')">
+                    <span class="checkmark">✓</span>
+                    <span>Thursday</span>
+                </div>
+                <div class="select-option" data-value="Friday" onclick="selectDay('Friday')">
+                    <span class="checkmark">✓</span>
+                    <span>Friday</span>
+                </div>
+                <div class="select-option" data-value="Saturday" onclick="selectDay('Saturday')">
+                    <span class="checkmark">✓</span>
+                    <span>Saturday</span>
+                </div>
+            </div>
+        </div>
+        <div class="dropdown-overlay" onclick="closeDropdown()"></div>
+    </div>
+
+    <div id="scheduleList" class="schedule-container">
+    </div>
+
+    <script>
+        // 2nd Semester Timetable Data
+        const scheduleData = {
+            "Monday": [
+                { time: "08:30 AM", subject: "VAC (12)", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "DD", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "DD", prof: "", type: "Major" },
+                { time: "01:00 PM", subject: "MC", prof: "", type: "MDC" }
+            ],
+            "Tuesday": [
+                { time: "08:30 AM", subject: "18A/25A", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "BD", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "BD", prof: "", type: "Major" }
+            ],
+            "Wednesday": [
+                { time: "08:30 AM", subject: "VAC (12)", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "MC", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "MC", prof: "", type: "Major" },
+                { time: "01:00 PM", subject: "DD", prof: "", type: "MDC" }
+            ],
+            "Thursday": [
+                { time: "08:30 AM", subject: "18A/25A", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "MC", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "MC", prof: "", type: "Major" }
+            ],
+            "Friday": [
+                { time: "08:30 AM", subject: "VAC (12)", prof: "", type: "Regular" },
+                { time: "09:15 AM", subject: "S", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "DD", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "DD", prof: "", type: "Major" },
+                { time: "01:00 PM", subject: "GJ", prof: "", type: "MDC" }
+            ],
+            "Saturday": [
+                { time: "08:30 AM", subject: "18A/25A", prof: "", type: "Regular" },
+                { time: "09:15 AM", subject: "S", prof: "", type: "Regular" },
+                { time: "10:00 AM", subject: "AS", prof: "", type: "Minor" },
+                { time: "11:45 AM", subject: "AS", prof: "", type: "Major" }
+            ]
+        };
+
+        let currentDay = "Monday";
+        
+        // Auto-set today's day
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let today = days[new Date().getDay()];
+        if (today === "Sunday") today = "Monday";
+        currentDay = today;
+        document.getElementById("selectedDay").innerText = today;
+        
+        // Update selected option visually
+        document.querySelectorAll('.select-option').forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.value === today) {
+                opt.classList.add('selected');
+            }
+        });
+
+        // Custom dropdown functions
+        function toggleDropdown() {
+            document.getElementById('dayDropdown').classList.toggle('open');
+        }
+
+        function closeDropdown() {
+            document.getElementById('dayDropdown').classList.remove('open');
+        }
+
+        function selectDay(day) {
+            currentDay = day;
+            document.getElementById('selectedDay').innerText = day;
+            
+            document.querySelectorAll('.select-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === day) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            closeDropdown();
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const day = currentDay;
+            const container = document.getElementById("scheduleList");
+            container.innerHTML = "";
+
+            let classes = scheduleData[day] || [];
+
+            if (classes.length === 0) {
+                container.innerHTML = `<div class="empty-state">No classes scheduled.</div>`;
+                return;
+            }
+
+            classes.forEach(cls => {
+                let cardClass = 'class-card';
+                let tagHtml = '';
+                
+                if (cls.type === 'Minor') {
+                    cardClass += ' minor';
+                    tagHtml = '<span class="tag minor">Minor</span>';
+                } else if (cls.type === 'Major') {
+                    cardClass += ' major';
+                    tagHtml = '<span class="tag major">Major</span>';
+                } else if (cls.type === 'MDC') {
+                    cardClass += ' mdc';
+                    tagHtml = '<span class="tag mdc">MDC</span>';
+                }
+                
+                const card = `
+                    <div class="${cardClass}">
+                        <div class="time-slot">
+                            <span class="time">${cls.time}</span>
+                            <span class="duration">${cls.type}</span>
+                        </div>
+                        <div class="subject-info">
+                            <div class="subject">${cls.subject}${tagHtml}</div>
+                            ${cls.prof ? `<span class="professor">Prof. ${cls.prof}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // Initial Render
+        renderSchedule();
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+
+    </script>
+</body>
+</html>
