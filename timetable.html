@@ -69,14 +69,13 @@
             display: flex;
             gap: 10px;
             margin-bottom: 24px;
-            background: rgba(26, 26, 46, 0.8);
-            backdrop-filter: blur(10px);
+            background: #1a1a2e;
             padding: 6px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            z-index: 1000;
+            z-index: 100;
         }
 
         /* Schedule Grid */
@@ -264,23 +263,25 @@
         }
 
         .select-options {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            background: linear-gradient(135deg, #1e2433 0%, #252d3d 100%);
+            position: fixed;
+            top: auto;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2433;
             border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 100;
-            min-width: 170px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+            width: 200px;
             max-height: 0;
             overflow: hidden;
             opacity: 0;
             transition: all 0.2s ease;
+            margin-top: 50px;
         }
 
         .custom-select.open .select-options {
-            max-height: 320px;
+            max-height: 350px;
             opacity: 1;
             padding: 8px 0;
         }
@@ -321,23 +322,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 90;
+            z-index: 9998;
+            background: rgba(0,0,0,0.3);
         }
 
         .custom-select.open ~ .dropdown-overlay {
             display: block;
-        }
-
-        .custom-select {
-            z-index: 100;
-        }
-
-        .custom-select.open {
-            z-index: 200;
-        }
-
-        .select-options {
-            z-index: 999;
         }
 
     </style>
