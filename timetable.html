@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Timetable">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>6th Sem Timetable</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --subtext: #94a3b8;
+            --accent: #3b82f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            color: var(--subtext);
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 5px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        select, button {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        select {
+            background-color: rgba(255,255,255,0.05);
+            outline: none;
+        }
+
+        .toggle-btn {
+            background-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .toggle-btn.inactive {
+            background-color: transparent;
+            color: var(--subtext);
+            font-weight: 400;
+        }
+
+        /* Schedule Grid */
+        .schedule-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .class-card {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .time-slot {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .duration {
+            font-size: 0.75rem;
+            color: var(--subtext);
+        }
+
+        .subject-info {
+            text-align: right;
+        }
+
+        .subject {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        .professor {
+            font-size: 0.85rem;
+            color: var(--subtext);
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--subtext);
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 6px;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .tag.theory { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag.practical { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Dept. of Computer Science</h1>
+        <p>Semester 6 Schedule</p>
+    </div>
+
+    <div class="controls">
+        <select id="daySelect" onchange="renderSchedule()">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+        </select>
+        <button id="weekToggle" class="toggle-btn" onclick="toggleWeek()">Week 1</button>
+    </div>
+
+    <div id="scheduleList" class="schedule-container">
+        </div>
+
+    <script>
+        // Data derived from the user's image for Sem 6
+        const scheduleData = {
+            "Monday": [
+                { time: "09:15 AM", subject: "Algorithms", prof: "BD", type: "Theory" },
+                { time: "11:00 AM", subject: "AI", prof: "BD", type: "Theory" },
+                { time: "11:45 AM", subject: "Cryptography", prof: "SL", type: "Theory" },
+                { time: "01:00 PM", subject: "ML (T)", prof: "SM", type: "Theory" },
+                { time: "01:45 PM", subject: "ML (P)", prof: "SM", type: "Practical" }
+            ],
+            "Tuesday": [
+                { time: "09:15 AM", subject: "Algorithms", prof: "SL", type: "Theory" },
+                { time: "11:00 AM", subject: "Cryptography", prof: "JK", type: "Theory" },
+                { time: "11:45 AM", subject: "AI", prof: "PT", type: "Theory" },
+                { time: "01:00 PM", subject: "ML (T)", prof: "SM", type: "Theory" },
+                { time: "01:45 PM", subject: "ML (P)", prof: "SM", type: "Practical" }
+            ],
+            "Wednesday": [
+                { time: "09:15 AM", subject: "Algorithms", prof: "BD", type: "Theory" },
+                { time: "11:00 AM", subject: "AI", prof: "PT", type: "Theory" },
+                { time: "11:45 AM", subject: "Cryptography", prof: "SL", type: "Theory" },
+                { time: "01:00 PM", subject: "ML (T)", prof: "SL", type: "Theory" }
+            ],
+            "Thursday": {
+                "Week 1": [
+                    { time: "09:15 AM", subject: "Cryptography", prof: "JK", type: "Theory" },
+                    { time: "11:00 AM", subject: "Algorithms", prof: "SL", type: "Theory" },
+                    { time: "11:45 AM", subject: "AI", prof: "BD", type: "Theory" },
+                    { time: "01:00 PM", subject: "ML (T)", prof: "SL", type: "Theory" },
+                    { time: "01:45 PM", subject: "VTC (P)", prof: "", type: "Practical" },
+                    { time: "02:30 PM", subject: "VTC (P)", prof: "", type: "Practical" },
+                    { time: "03:15 PM", subject: "VTC (P)", prof: "", type: "Practical" }
+                ],
+                "Week 2": [
+                    { time: "09:15 AM", subject: "Cryptography", prof: "JK", type: "Theory" },
+                    { time: "11:00 AM", subject: "Algorithms", prof: "SL", type: "Theory" },
+                    { time: "11:45 AM", subject: "AI", prof: "BD", type: "Theory" },
+                    { time: "01:00 PM", subject: "ML (T)", prof: "SL", type: "Theory" },
+                    { time: "01:45 PM", subject: "VTC (T)", prof: "", type: "Theory" },
+                ]
+            },
+            "Friday": {
+                "Week 1": [
+                    { time: "09:15 AM", subject: "ML (T)", prof: "SL", type: "Theory" },
+                    { time: "11:00 AM", subject: "AI", prof: "BD", type: "Theory" },
+                    { time: "11:45 AM", subject: "Cryptography", prof: "SL", type: "Theory" },
+                    { time: "01:00 PM", subject: "ML (T)", prof: "SM", type: "Theory" },
+                    { time: "01:45 PM", subject: "VTC (P)", prof: "", type: "Practical" },
+                    { time: "02:30 PM", subject: "VTC (P)", prof: "", type: "Practical" },
+                    { time: "03:15 PM", subject: "VTC (P)", prof: "", type: "Practical" }
+                ],
+                "Week 2": [
+                    { time: "09:15 AM", subject: "ML (T)", prof: "SL", type: "Theory" },
+                    { time: "11:00 AM", subject: "AI", prof: "BD", type: "Theory" },
+                    { time: "11:45 AM", subject: "Cryptography", prof: "SL", type: "Theory" },
+                    { time: "01:00 PM", subject: "ML (T)", prof: "SM", type: "Theory" },
+                    { time: "01:45 PM", subject: "VTC (T)", prof: "", type: "Theory" },
+                    { time: "02:30 PM", subject: "No Sem 6", prof: "", type: "Info" },
+                    { time: "03:15 PM", subject: "Prac. maybe", prof: "", type: "Info" }
+                ]
+            },
+            "Saturday": [
+                { time: "09:15 AM", subject: "Algorithms", prof: "SM", type: "Theory" },
+                { time: "11:00 AM", subject: "ML (T)", prof: "SM", type: "Theory" },
+                { time: "11:45 AM", subject: "Cryptography", prof: "JK", type: "Theory" },
+                { time: "01:00 PM", subject: "Algorithms", prof: "BD", type: "Theory" }
+            ]
+        };
+
+        let currentWeek = "Week 1";
+        
+        // Auto-set today's day
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let today = days[new Date().getDay()];
+        if (today === "Sunday") today = "Monday"; // Default to Mon if Sunday
+        document.getElementById("daySelect").value = today;
+
+        function toggleWeek() {
+            currentWeek = currentWeek === "Week 1" ? "Week 2" : "Week 1";
+            document.getElementById("weekToggle").innerText = currentWeek;
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const day = document.getElementById("daySelect").value;
+            const container = document.getElementById("scheduleList");
+            container.innerHTML = "";
+
+            let classes = [];
+
+            // Check if the day has alternating weeks
+            if (Array.isArray(scheduleData[day])) {
+                classes = scheduleData[day];
+            } else if (scheduleData[day] && scheduleData[day][currentWeek]) {
+                classes = scheduleData[day][currentWeek];
+            }
+
+            if (classes.length === 0) {
+                container.innerHTML = `<div class="empty-state">No classes scheduled.</div>`;
+                return;
+            }
+
+            classes.forEach(cls => {
+                const tagClass = cls.type === 'Practical' ? 'practical' : 'theory';
+                
+                const card = `
+                    <div class="class-card">
+                        <div class="time-slot">
+                            <span class="time">${cls.time}</span>
+                            <span class="duration">${cls.type}</span>
+                        </div>
+                        <div class="subject-info">
+                            <div class="subject">${cls.subject}</div>
+                            ${cls.prof ? `<span class="professor">Prof. ${cls.prof}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // Initial Render
+        renderSchedule();
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+
+    </script>
+</body>
+</html>
